@@ -12,7 +12,7 @@
 #include <math.h>
 #include "rngs.h"
 
-#define NOISY 0
+#define NOISY 1
 
 int checkSmithy(int p, int p2, struct gameState *post, int handPos)
 {
@@ -22,7 +22,8 @@ int checkSmithy(int p, int p2, struct gameState *post, int handPos)
   struct gameState pre;
   memcpy (&pre, post, sizeof(struct gameState));
 
-  playSmithy(p, post, handPos);
+  //playSmithy(p, post, handPos);
+  cardEffect(smithy, 0, 0, 0, post, handPos, 0);
 
   // if deck and discard are empty or not enough cards to draw 3
   if (pre.deckCount[p] + pre.discardCount[p] <= 3)

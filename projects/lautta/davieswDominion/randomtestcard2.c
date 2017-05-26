@@ -1,6 +1,6 @@
 /*
- * randomtestcard1.c
- * Testing smithy effect
+ * randomtestcard2.c
+ * Testing village effect
  */
 
 #include "dominion.h"
@@ -12,23 +12,21 @@
 #include <math.h>
 #include "rngs.h"
 
-#define NOISY 0
+#define NOISY 1
 
-int checkSmithy(int p, int p2, struct gameState *post, int handPos)
+int checkVillage(int p, int p2, struct gameState *post, int handPos)
 {
-  int discarded = 0;
   int testSuccess = 1;
 
   struct gameState pre;
   memcpy (&pre, post, sizeof(struct gameState));
 
-  playSmithy(p, post, handPos);
+  //playVillage(p, post, handPos);
+  cardEffect(village, 0, 0, 0, post, handPos, 0);
 
-  // if deck and discard are empty or not enough cards to draw 3
-  if (pre.deckCount[p] + pre.discardCount[p] <= 3)
+  // if deck and discard are empty
+  if (pre.deckCount[p] + pre.discardCount[p] <= 0)
   {
-    discarded = pre.deckCount[p] + pre.discardCount[p];
-
     if (post->deckCount[p] != 0)
     {
       if(NOISY)
@@ -36,28 +34,20 @@ int checkSmithy(int p, int p2, struct gameState *post, int handPos)
       testSuccess = 0;
     }
 
-    if (post->discardCount[p] != 0)
+    if (post->handCount[p] != pre.handCount[p] - 1)
     {
       if(NOISY)
-        printf("FAILED! discard count = %d, expected = %d\n", post->discardCount[p], 0);
-      testSuccess = 0;
-    }
-
-    if (post->handCount[p] != pre.handCount[p] + discarded - 1)
-    {
-      if(NOISY)
-        printf("FAILED! hand count = %d, expected = %d\n", post->handCount[p], pre.handCount[p] + discarded - 1);
+        printf("FAILED! hand count = %d, expected = %d\n", post->handCount[p], pre.handCount[p] - 1);
       testSuccess = 0;
     }
   }
-  // if deck is less than 3, deck will need to be shuffled
-  else if (pre.deckCount[p] < 3)
+  // deck is empty, shuffle will happened
+  else if (pre.deckCount[p] == 0)
   {
-    int drawn = 3 - pre.deckCount[p];
-    if (post->handCount[p] != pre.handCount[p] + 2)
+    if (post->handCount[p] != pre.handCount[p])
     {
       if(NOISY)
-        printf("FAILED! hand count = %d, expected = %d\n", post->handCount[p], pre.handCount[p] + 2);
+        printf("FAILED! hand count = %d, expected = %d\n", post->handCount[p], pre.handCount[p]);
       testSuccess = 0;
     }
 
@@ -68,28 +58,28 @@ int checkSmithy(int p, int p2, struct gameState *post, int handPos)
       testSuccess = 0;
     }
 
-    if (post->deckCount[p] != pre.discardCount[p] - drawn)
+    if (post->deckCount[p] != pre.discardCount[p] - 1)
     {
       if(NOISY)
-        printf("FAILED! *** deck count = %d, expected = %d\n", post->deckCount[p], pre.discardCount[p] - drawn);
+        printf("FAILED! deck count = %d, expected = %d\n", post->deckCount[p], pre.discardCount[p] - 1);
       testSuccess = 0;
     }
   }
   // otherwise, normal behavior
   else
   {
-    if (post->deckCount[p] != pre.deckCount[p] - 3)
+    if (post->deckCount[p] != pre.deckCount[p] - 1)
     {
       if(NOISY)
-        printf("FAILED! * deck count = %d, expected = %d\n", post->deckCount[p], pre.deckCount[p] - 3);
+        printf("FAILED! deck count = %d, expected = %d\n", post->deckCount[p], pre.deckCount[p] - 1);
       testSuccess = 0;
     }
 
 
-    if (post->handCount[p] != pre.handCount[p] + 2)
+    if (post->handCount[p] != pre.handCount[p])
     {
       if(NOISY)
-        printf("FAILED! hand count = %d, expected = %d\n", post->handCount[p], pre.handCount[p] + 2);
+        printf("FAILED! hand count = %d, expected = %d\n", post->handCount[p], pre.handCount[p]);
       testSuccess = 0;
     }
   }
@@ -106,14 +96,15 @@ int checkSmithy(int p, int p2, struct gameState *post, int handPos)
     testSuccess = 0;
   }
 
-  // check other state variables, this is where my bug will be found
-  if (post->numActions != pre.numActions)
+  // village gives 2 actions
+  if (post->numActions != pre.numActions + 2)
   {
     if(NOISY)
-      printf("FAILED! actions = %d, expected = %d\n", post->numActions, pre.numActions);
+      printf("FAILED! actions = %d, expected = %d\n", post->numActions, pre.numActions + 2);
     testSuccess = 0;
   }
 
+  // check other state variables, this is where my bug will be found
   if (post->whoseTurn != pre.whoseTurn)
   {
     if(NOISY)
@@ -142,10 +133,10 @@ int checkSmithy(int p, int p2, struct gameState *post, int handPos)
     testSuccess = 0;
   }
 
-  if (post->playedCards[post->playedCardCount-1] != smithy)
+  if (post->playedCards[post->playedCardCount-1] != village)
   {
     if(NOISY)
-      printf("FAILED! played card = %d, expected = %d\n", post->playedCards[post->playedCardCount-1], smithy);
+      printf("FAILED! played card = %d, expected = %d\n", post->playedCards[post->playedCardCount-1], village);
     testSuccess = 0;
   }
 
@@ -164,7 +155,7 @@ int main(){
   int player2;
   int position;
 
-  printf ("Testing smithy\n");
+  printf ("Testing village\n");
 
   printf ("RANDOM TESTS\n");
 
@@ -191,7 +182,7 @@ int main(){
     G.deckCount[player] = floor(Random() * MAX_DECK);
     G.discardCount[player] = floor(Random() * MAX_DECK);
 
-    // at least 1 for smithy
+    // at least 1 for village
     G.handCount[player] = floor(Random() * (MAX_HAND - 1)) + 1;
 
     G.deckCount[player2] = floor(Random() * MAX_DECK);
@@ -204,9 +195,9 @@ int main(){
       G.hand[player][i] = floor(Random() * 27);
     }
 
-    // smithy card in random hand position
+    // village card in random hand position
     position = floor(Random() * (G.handCount[player] - 1));
-    G.hand[player][position] = smithy;
+    G.hand[player][position] = village;
 
     // fill randomized deck count with randomized cards
     for (i = 0; i < G.deckCount[player]; i++)
@@ -220,13 +211,13 @@ int main(){
       G.discard[player][i] = floor(Random() * 27);
     }
 
-    success = checkSmithy(player, player2, &G, position);
+    success = checkVillage(player, player2, &G, position);
 
     if (success == 1)
       successCount++;
   }
 
-  printf("\n >>>>> Smithy test success: %d out of 2000 tests <<<<<\n\n", successCount);
+  printf("\n >>>>> Village test success: %d out of 2000 tests <<<<<\n\n", successCount);
 
   return 0;
 }

@@ -1,0 +1,139 @@
+Bug Report 1
+============
+
+Title:	smithy cardEffect produces incorrect card counts/values when called
+
+Class:	Serious Bug
+
+Date:   	05/23/2017        
+Reported By:   	August Lautt
+Email:      	lautta@oregonstate.edu
+
+Product:	dominion.c	Version:	https://github.com/daviesw/CS362-004-SP17/tree/master/dominion
+
+Is it reproducible: Yes
+
+Description
+===========
+When the smithy cardEffect is called, the game state variables for handCount and deckCount have incorrect values 
+for the current player whose player number was passed to the function.
+
+I initiated a valid new game with valid gameState variables and then my calls to cardEffect(smithy) produced 
+the incorrect behavior. The handCount value is too large by 1 and the deckCount is too small by 1.
+
+
+Steps to Produce/Reproduce
+--------------------------
+1. Set up a random seed, a valid array of kingdom cards, a gameState, and a number of players variable.
+
+2. Initialize a game using those variables by calling: initializeGame(numPlayers, k, seed, &G);
+
+3. Place smithy card into player-to-test's hand: G.hand[thisPlayer][handpos] = smithy;
+   -thisPlayer should be the player-to-test's player number and handpos should be a valid hand position number
+
+4. Call card effect with smithy: cardEffect(smithy, choice1, choice2, choice3, &G, handpos, &bonus);
+   -choice1, choice2, choice3, and bonus can all be set to 0 for smithy.
+   -use the created gamestate and handpos from the earlier steps
+
+
+Expected Results / Actual Results
+----------------------------------
+TEST 1: current player gains 3 cards and smithy added to played pile
+TEST 1 FAILED
+-- played card count = 1, expected = 1
+-- hand count = 8, expected = 7
+-- card id = 13, expected = 13
+TEST 3: current player drawing from own pile
+TEST 3 FAILED
+-- deck count = 1, expected = 2
+
+
+Workarounds
+-----------
+None
+
+
+Attachments
+-----------
+Test results found in:
+/projects/lautta/davieswDominion/unittestresults.out
+/projects/lautta/davieswDominion/randomtestcard1.out
+
+
+Other Information
+-----------------
+None
+
+
+
+Bug Report 2
+============
+
+Title:	council_room cardEffect produces incorrect card counts/values when called
+
+Class:	Serious Bug
+
+Date:   	05/23/2017        
+Reported By:   	August Lautt
+Email:      	lautta@oregonstate.edu
+
+Product:	dominion.c	Version:	https://github.com/daviesw/CS362-004-SP17/tree/master/dominion
+
+Is it reproducible: Yes
+
+Description
+===========
+When the smithy cardEffect is called, the game state variables for handCount and deckCount have incorrect values 
+for the current player whose player number is passed to the function, as well as for the other players in the
+game.
+
+I initiated a valid new game with valid gameState variables and then my calls to cardEffect(council_room) produced 
+the incorrect behavior. For the player whose number was passed to the function, the handCount value is too large 
+by 1 and the deckCount is too small by 1. For the other players of the game, their handCount value should increase 
+by 1 and deckCount should decrease by 1, but they remain unchanged.
+
+
+Steps to Produce/Reproduce
+--------------------------
+1. Set up a random seed, a valid array of kingdom cards, a gameState, and a number of players variable.
+
+2. Initialize a game using those variables by calling: initializeGame(numPlayers, k, seed, &G);
+
+3. Place council_room card into player-to-test's hand: G.hand[thisPlayer][handpos] = smithy;
+   -thisPlayer should be the player-to-test's player number and handpos should be a valid hand position number
+
+4. Call card effect with council_room: cardEffect(council_room, choice1, choice2, choice3, &G, handpos, &bonus);
+   -choice1, choice2, choice3, and bonus can all be set to 0 for smithy.
+   -use the created gamestate and handpos from the earlier steps
+
+
+Expected Results / Actual Results
+----------------------------------
+TEST 1: current player gains 4 cards and council room added to played pile
+TEST 1 FAILED
+-- played card count = 1, expected = 1
+-- hand count = 9, expected = 8
+-- card id = 8, expected = 8
+TEST 2: other players gain card in hand and deck decreases
+TEST 2 FAILED
+-- hand count = 0, expected = 1
+-- deck count = 10, expected = 9
+TEST 3: current player drawing from own pile
+TEST 3 FAILED
+-- deck count = 0, expected = 1
+
+
+Workarounds
+-----------
+None
+
+
+Attachments
+-----------
+Test results found in:
+/projects/lautta/davieswDominion/unittestrestults.out
+
+
+Other Information
+-----------------
+None

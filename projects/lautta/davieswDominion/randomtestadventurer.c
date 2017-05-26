@@ -29,7 +29,8 @@ int checkAdventurer(int p, int p2, struct gameState *post, int handPos, int trea
   struct gameState pre;
   memcpy (&pre, post, sizeof(struct gameState));
 
-  playAdventurer(drawntreasure, post, p, cardDrawn, temphand, z);
+  //playAdventurer(drawntreasure, post, p, cardDrawn, temphand, z);
+  cardEffect(adventurer, 0, 0, 0, post, handPos, 0);
 
   // check hand increased
   if (post->handCount[p] != pre.handCount[p] + 2)
@@ -84,6 +85,7 @@ int checkAdventurer(int p, int p2, struct gameState *post, int handPos, int trea
       printf("FAILED! new hand card 2 = %d, expected = 4, 5, or 6\n", treasure2);
     testSuccess = 0;
   }
+
 
   // check other player counts
   if (post->handCount[p2] != pre.handCount[p2] || post->deckCount[p2] != pre.deckCount[p2] || post->discardCount[p2] != pre.discardCount[p2])

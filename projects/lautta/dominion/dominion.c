@@ -1275,7 +1275,9 @@ int updateCoins(int player, struct gameState *state, int bonus)
 // REFACTORED CARD EFFECT FUNCTIONS
 int playAdventurer(int drawntreasure, struct gameState *state, int currentPlayer, int cardDrawn, int temphand[], int z)
 {
-      while(drawntreasure<=2){
+      // fixed bug to only draw 2 treasures instead of 3
+      //while(drawntreasure<=2){
+      while(drawntreasure<2){
         if (state->deckCount[currentPlayer] <1){//if the deck is empty we need to shuffle discard and add to deck
           shuffle(currentPlayer, state);
         }
